@@ -47,6 +47,7 @@ INFRAPOWER_URL    := https://www.austin-hughes.com/support/software/infrapower/I
 LIEBERT_URL       := https://www.vertiv.com/globalassets/documents/software/monitoring/lgpmib-win_rev16_299461_0.zip
 EATON_URL         := https://powerquality.eaton.com/Support/Software-Drivers/Downloads/ePDU/EATON-EPDU-MIB.zip
 EATON_OIDS_URL    := https://raw.githubusercontent.com/librenms/librenms/master/mibs/eaton/EATON-OIDS
+YAMAHA_URL        := http://www.rtpro.yamaha.co.jp/RT/docs/mib/yamaha-private-mib.tar.gz
 
 .DEFAULT: all
 
@@ -60,7 +61,8 @@ clean:
 		$(MIBDIR)/.net-snmp \
 		$(MIBDIR)/.paloalto_panos \
 		$(MIBDIR)/.synology \
-		$(MIBDIR)/.kemp-lm
+		$(MIBDIR)/.kemp-lm \
+		$(MIBDIR)/.yamaha
 
 generator: *.go
 	go build
@@ -120,7 +122,8 @@ mibs: mib-dir \
   $(MIBDIR)/LIEBERT_GP_PDU.MIB \
   $(MIBDIR)/EATON-EPDU-MIB.txt \
   $(MIBDIR)/EATON-SENSOR-MIB.txt \
-  $(MIBDIR)/EATON-OIDS.txt
+  $(MIBDIR)/EATON-OIDS.txt \
+  $(MIBDIR)/.yamaha
 
 mib-dir:
 	@mkdir -p -v $(MIBDIR)
@@ -303,3 +306,10 @@ $(MIBDIR)/EATON-OIDS.txt:
 	@echo ">> Downloading EATON-OIDS.txt to $@"
 	@curl $(CURL_OPTS) -o $@ $(EATON_OIDS_URL)
 
+$(MIBDIR)/.yamaha:
+	$(eval TMP := $(shell mktemp))
+	@echo ">> Downloading yamaha private mibs"
+	@curl $(CURL_OPTS) -o $(TMP) $(YAMAHA_URL)
+	tar --no-same-owner -C $(MIBDIR)/ -zxvf $(TMP)
+	@rm -v $(TMP)
+	@touch $(MIBDIR)/.yamaha

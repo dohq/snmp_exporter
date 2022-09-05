@@ -310,6 +310,6 @@ $(MIBDIR)/.yamaha:
 	$(eval TMP := $(shell mktemp))
 	@echo ">> Downloading yamaha private mibs"
 	@curl $(CURL_OPTS) -o $(TMP) $(YAMAHA_URL)
-	tar --no-same-owner -C $(MIBDIR)/ -zxvf $(TMP)
+	tar --no-same-owner --strip-components=1 -C $(MIBDIR)/ -zxvf $(TMP)
 	@rm -v $(TMP)
 	@touch $(MIBDIR)/.yamaha
